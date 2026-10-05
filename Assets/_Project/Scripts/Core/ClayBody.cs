@@ -73,7 +73,7 @@ namespace ClayForge.Core
         {
             if (_meshRenderer == null)
                 return;
-            _meshRenderer.material.color = color;
+            _meshRenderer.material.SetColor("_BaseColor", color);
         }
 
         public void ResetLump()

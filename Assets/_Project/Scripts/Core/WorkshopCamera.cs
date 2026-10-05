@@ -41,11 +41,11 @@ namespace ClayForge.Core
             {
                 case Mode.Orbit:
                     var t = Time.time * 0.15f;
-                    transform.position = target.position + new Vector3(Mathf.Sin(t) * 1.8f, 1.15f, Mathf.Cos(t) * 1.8f);
+                    transform.position = target.position + new Vector3(Mathf.Sin(t) * 3.2f, 1.6f, Mathf.Cos(t) * 3.2f);
                     transform.LookAt(target.position + Vector3.up * 0.25f);
                     break;
                 case Mode.Hands:
-                    transform.position = target.position + new Vector3(0f, 0.95f, -0.85f);
+                    transform.position = target.position + new Vector3(0.15f, 1.2f, -2.2f);
                     transform.LookAt(target.position + Vector3.up * 0.2f);
                     break;
                 default:

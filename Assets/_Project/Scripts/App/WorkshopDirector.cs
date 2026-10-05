@@ -90,8 +90,9 @@ namespace ClayForge.App
             SetColor(hub, new Color(0.12f, 0.12f, 0.12f));
 
             var clayAnchor = new GameObject("ClayAnchor").transform;
-            clayAnchor.SetParent(surface.transform, false);
-            clayAnchor.localPosition = new Vector3(0f, 1.05f, 0f);
+            // Keep the clay outside the wheel's non-uniform visual scale so its mesh stays round.
+            clayAnchor.SetParent(wheelRoot.transform, false);
+            clayAnchor.localPosition = new Vector3(0f, 0.12f, 0f);
 
             _wheel = wheelRoot.AddComponent<PotteryWheel>();
             _wheel.Bind(surface.transform, clayAnchor);
@@ -101,7 +102,9 @@ namespace ClayForge.App
             clayGo.transform.SetParent(clayAnchor, false);
             clayGo.AddComponent<MeshFilter>();
             var renderer = clayGo.AddComponent<MeshRenderer>();
-            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard"));
+            var clayMaterial = new Material(FindLitShader());
+            clayMaterial.SetColor("_BaseColor", clayTypes[0].WetColor);
+            renderer.material = clayMaterial;
             clayGo.AddComponent<MeshCollider>();
             var physics = clayGo.AddComponent<ClayPhysics>();
             _clay = clayGo.AddComponent<ClayBody>();
@@ -136,8 +139,10 @@ namespace ClayForge.App
                 camGo.AddComponent<AudioListener>();
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.55f, 0.47f, 0.38f);
-            camGo.transform.position = new Vector3(0f, 1.15f, -1.85f);
-            camGo.transform.LookAt(new Vector3(0f, 0.28f, 0f));
+            cam.nearClipPlane = 0.05f;
+            cam.fieldOfView = 52f;
+            camGo.transform.position = new Vector3(2.6f, 1.9f, -3f);
+            camGo.transform.LookAt(new Vector3(0f, 0.35f, 0f));
             _cameraRig = camGo.AddComponent<WorkshopCamera>();
             _cameraRig.Bind(clayGo.transform, cam);
 
@@ -211,8 +216,17 @@ namespace ClayForge.App
             var renderer = go.GetComponent<Renderer>();
             if (renderer == null)
                 return;
-            var shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-            renderer.material = new Material(shader) { color = color };
+            var material = new Material(FindLitShader());
+            material.SetColor("_BaseColor", color);
+            renderer.material = material;
+        }
+
+        private static Shader FindLitShader()
+        {
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null)
+                throw new System.InvalidOperationException("URP Lit shader is missing. Assign the ClayForge URP pipeline asset.");
+            return shader;
         }
 
         private static ClayType[] CreateDefaultClays()
