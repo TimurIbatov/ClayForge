@@ -1,0 +1,10 @@
+#pragma kernel CSMain
+
+// Phase 1 seam: particle advection / density field for High-detail clay.
+RWTexture3D<float> Density;
+
+[numthreads(8, 8, 8)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    Density[id] = Density[id];
+}
